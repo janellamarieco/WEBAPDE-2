@@ -113,7 +113,7 @@
                                 user.id + '">' + user.username + '</a>');
                 
                 //assemble
-                $(photo).prepend('<img id="theImg" src="' + data.url + '.png" />');
+                $(photo).prepend('<img id="theImg" src="' +  data.url.slice(0, 4) + "s" + data.url.slice(4, data.url.length) + '.png" />');
                 $(modal).append(close);
                 $(modal).append(photo);
                 $(modal).append(caption);

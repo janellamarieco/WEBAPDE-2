@@ -1,0 +1,582 @@
+<html>
+
+    <head>
+        <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"/>
+        
+        <script src="jquery-3.2.1.min.js"></script>
+        <meta name="viewport" content="width=device-width" />
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4217tuYuAr0OEV9tCKW4Ol2DgDsxjueg"></script>
+        
+        <link rel="stylesheet"
+              type = "text/css"
+              href="stylesheet.css">
+        
+        <style>
+            
+            .post{
+                margin: 0 auto;
+                width: 400px;
+                background-color: #eeeeee;
+                border-radius: 10px;
+                margin-bottom: 15px;
+            }
+
+            .post-topbar{
+                position:relative;
+                top: 15px;
+                margin: 0 auto;
+                width:auto;
+                padding: 6px;
+                background-color: #3888a8;
+                z-index: 0;
+                border-left-style:solid;
+                border-right-style: solid;
+                border-top-style: solid;
+                border-color:lightgrey;
+                border-width: 1px;
+            }
+
+            .user-icon{
+                position: absolute;
+                margin-left: 10px;
+                width: 60px;
+                height: 60px;
+                border-radius: 100px;
+                background-color: #ff9898;
+                z-index: 1;
+                border-style:solid;
+                border-width: 2px;
+                border-color: #3888a8;
+            }
+
+            .post-username{
+                margin-left: 75px;
+                margin-bottom: 10px;
+            }
+
+            .post-body{
+                width:auto;
+                height: auto;
+                background-color: white;
+                border-style:solid;
+                border-color:lightgrey;
+                border-width: 1px;
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+
+            .post-titlebar{
+                position: relative;
+                top: 10px;
+                margin: 0 auto;
+                margin-top: 15px;
+                font-size: 1.1em;
+                padding:20px;
+            }
+
+            .post-content{
+                position: relative;
+                margin: 0 auto;
+                margin-left: 30px;
+                padding: 20px;
+                padding-top: 0px;
+            }
+            
+            .col{
+                width: 180px;
+                height: 200px;
+                display: inline-block;
+                margin-top: 10px;
+                margin-right: 15px;
+                padding: 15px;
+                padding-bottom: 2px;
+                padding-top: 2px;
+                background-color: skyblue;
+                float: left;
+                box-shadow: 2px 2px 6px rgb(118, 68, 31);
+            }
+
+            .album-previews{
+                margin: 0 auto;
+                text-align: center;
+                max-width: 425px;
+                word-wrap:break-word;
+                margin-top: 20px;
+                max-height:230px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                white-space:nowrap;
+                display:inline-block;
+            }
+
+            .album-previews::-webkit-scrollbar-thumb{
+                border-radius: 10px;
+                -webkit-box-shadow: inset 0 0 6px rgb(118, 68, 31);
+                background-color: rgba(118, 68, 31, 0.21);
+            }
+
+            .album-previews::-webkit-scrollbar-track{
+                -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.73);
+                border-radius: 10px;
+                background-color: rgba(255, 253, 249, 0.52);
+            }
+
+            .album-previews::-webkit-scrollbar{
+                background-color: rgba(0, 0, 0, 0);
+            }
+
+            .album{
+                width: 150px;
+                height: 150px;
+                padding: 10px;
+                padding-bottom:30px;
+                margin: 5px;
+                background-color: aliceblue;
+                display:inline-block;
+                box-shadow: 3px 3px 5px rgba(118, 68, 31, 0.8);
+                opacity: 1;
+                margin-left: 10px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .album:hover{
+                opacity: 0.8;
+            }
+            
+            .preview-photo{
+                width:150px;
+                height:150px;
+                background-color:skyblue;
+            }
+            
+            .preview-photo:hover{
+                transition: all 0.3s ease-in;
+            }
+            
+            .album-title{
+                width: 150px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            #username{
+                line-height: 60px;
+                position: relative;
+                display: inline;
+                margin: 0 auto;
+                margin-left: 80px;
+                padding: 0px;
+            }
+		
+	       #googleMap{
+                position: fixed;
+                z-index: 2;
+                width: 400px;
+                height: 300px;
+                right:7;
+                overflow:hidden; /* Enable scroll if needed */
+                background-color: rgb(0,0,0); /* Fallback color */
+                background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+                box-shadow: 0 0 10px #000000;
+            }
+        </style>
+        
+        <script>
+        
+            var loaded = 0;
+            var loadA = 0;
+            var root = 'https://jsonplaceholder.typicode.com';
+            var userId = localStorage.getItem("userId");
+            
+            var nPosts = function () {
+                var tmp = null;
+                $.ajax({
+                    'async': false,
+                    url: root + '/users/' + userId + '/posts/',
+                    method: 'GET',
+                    success: (function(data) {
+                        tmp = data.length;
+                    }),
+                });
+                return tmp;
+            }();
+
+            var nAlbums = function () {
+                var tmp = null;
+                $.ajax({
+                    'async': false,
+                    url: root + '/users/' + userId + '/albums/',
+                    method: 'GET',
+                    success: (function(data) {
+                        tmp = data.length;
+                    }),
+                });
+                return tmp;
+            }();
+
+			function loadAlbums(){
+                for(i = 1; i <= 10 && loadA * 10 <= nAlbums && i <= nAlbums; i++){
+                    (function(i, loadA) {
+                        $.ajax({
+                            url: root + '/users/' + userId + '/albums/' ,
+                            method: 'GET',
+                            error: function()
+                            {
+                                //file does not exists
+                                console.log("File does not exist");
+                            },
+                            success: function(data)
+                            {
+                                console.log("LOAD ALBUM: " + (nAlbums-loadA-i));
+                                createAlbum(data[nAlbums - loadA - i]);
+                            }
+                        });
+                    })(i, loadA);
+                }
+
+                loadA += 10;
+            }
+
+			function loadPosts(){
+                console.log(loaded + " SA " + nPosts );
+                //"nPosts == 0" di ko na magawang maalis to jaskdkjkd pero naalis ko siya before,
+                for(i = 1; i <= 10 && loaded <= nPosts && i <= nPosts; i++){
+                      (function(i, loaded) {
+                            $.ajax({
+                                url: root + '/users/' + userId + '/posts/' ,
+                                method: 'GET',
+                                error: function()
+                                {
+                                    //file does not exists
+                                    console.log("File does not exist");
+                                },
+                                success: function(data)
+                                {
+                                    console.log("LOAD POST: " + (nPosts - loaded - i));
+                                    createPost(data[nPosts - loaded - i]);
+                                }
+                            });
+                      })(i, loaded);
+                }
+
+                loaded += 10;
+                if(loaded == nPosts)
+                    console.log("SHOW SOMETHING");
+            }
+
+            function createAlbum(data){
+                $.ajax(root + '/albums/' + data.id+ '/photos/', {
+                    method: 'GET'
+                }).then(function(temp){
+                    console.log(data.id + ": " + temp[1].albumId);
+                    postAlbum(data, temp[Math.floor((Math.random() * temp.length) + 0)], temp.length);
+                });
+            }
+
+            function createPost(data){
+                $.ajax(root + '/users/' + data.userId, {
+                    method: 'GET'
+                }).then(function(temp){
+                    postItem(data, temp);
+                });
+            }
+
+            function postAlbum(data, temp, nPhotos){
+                //create elements
+                var album = document.createElement("div");
+                var icon = document.createElement("div");
+                var title = document.createElement("div");
+                
+                album.setAttribute('href', '#');
+                album.setAttribute('id', data.id);
+                album.setAttribute('title', data.title);
+                album.setAttribute('nPhotos', nPhotos);
+
+                console.log(data.id + " " + temp.thumbnailUrl + " " + data.title);
+                //add classes
+                $(album).addClass("album");
+                $(icon).addClass("preview-photo");
+                $(title).addClass("album-title");
+                
+                $(title).text(data.title);
+
+                //assemble
+                $(icon).prepend('<img id="theImg" src="' + temp.thumbnailUrl + '.png" />');
+                $(album).append(icon);
+                $(album).append(title);
+                $(".album-previews").append(album);
+
+                console.log("ALBUMM");
+
+            }
+            
+            function postItem(data, temp){
+                var t = data.title;
+                var c = data.body;
+                var u = temp.username;
+                
+                //create elements
+                var post = document.createElement("div");
+                var icon = document.createElement("div");
+                var tb = document.createElement("div");
+                var un = document.createElement("a");
+                var body = document.createElement("div");
+                var btb = document.createElement("div");
+                var bcon = document.createElement("div");
+                
+                //icon.setAttribute('src', 'media/icon.png');
+                un.setAttribute('href', '#');
+                un.setAttribute('id', data.userId);
+                
+                //add classes
+                $(post).addClass("post");
+                $(icon).addClass("user-icon");
+                $(tb).addClass("post-topbar");
+                $(un).addClass("post-username");
+                $(body).addClass("post-body");
+                $(btb).addClass("post-titlebar");
+                $(bcon).addClass("post-content");
+                
+                //add values
+                $(btb).text(t);
+                $(bcon).text(c);
+                $(un).text(u);
+                
+                //assemble
+                $(body).append(btb);
+                $(body).append(bcon);
+                
+                $(tb).append(un);
+                
+                $(post).append(icon);
+                $(post).append(tb);
+                $(post).append(body);
+                
+                $("#feed").append(post);
+                
+                console.log("hh");
+            }
+
+            function updateUserInfo(temp){
+                document.getElementById("name").innerHTML           = temp.name;
+                document.getElementById("email").innerHTML          = temp.email;
+                document.getElementById("address").innerHTML        = temp.address.street  + " " +
+                                                                      temp.address.suite   + " " +
+                                                                      temp.address.city    +
+                                                                      "<br><span style=\"display:inline-block; height: 20;\"></span>Zip" +
+                                                                        "<span style=\"display:inline-block; width: 6;\"></span>:" +
+                                                                        "<span style=\"display:inline-block; width: 10;\"></span>" +
+                                                                      temp.address.zipcode;
+
+                document.getElementById("phone").innerHTML          = temp.phone;
+                document.getElementById("website").innerHTML        = temp.website;
+                document.getElementById("company-name").innerHTML   = temp.company.name;
+                document.getElementById("company-cp").innerHTML     = temp.company.catchPhrase;
+                document.getElementById("bs").innerHTML             = temp.company.bs;
+
+
+                var mapCanvas = document.createElement("div");
+                mapCanvas.setAttribute('id', 'googleMap');
+
+                var mapOptions = {
+                    center: new google.maps.LatLng(temp.address.geo.lat, temp.address.geo.lng),
+                    zoom: 5
+                };
+
+                var map = new google.maps.Map(mapCanvas, mapOptions);
+
+                var marker = new google.maps.Marker({
+                                position: new google.maps.LatLng(temp.address.geo.lat, temp.address.geo.lng),
+                                map: map
+                             });
+
+                $("#address").mouseover(function(){
+                    mapCanvas.style.display = "block";
+                });
+
+                $(mapCanvas).mouseover(function(){
+                    mapCanvas.style.display = "block";
+                });
+
+                $(mapCanvas).mouseout(function(){
+                    mapCanvas.style.display = "none";
+                });
+                document.getElementById("address").append(mapCanvas);
+            }
+
+            $(document).ready(function(){
+                $.ajax({
+                    url: root + '/users/' + userId,
+                    method: 'GET',
+                    success: function(temp){
+                        updateUserInfo(temp);
+                        console.log("Updated user's info");
+                    }
+                });
+                document.getElementById("username").innerHTML = localStorage.getItem("username");
+
+                loadPosts();
+                loadAlbums();
+
+
+                $(".feed").scroll(function() {
+                    var div = $(this);
+                    var scroll = 0;
+
+/*                    setTimeout(function() {
+                        scroll = div.scrollTop();
+                    }, 200);
+                    console.log(scroll);*/
+
+                    if (Math.round($(this).scrollTop()) == $(".feed")[0].scrollHeight - 600) { //scrollTop is 0 based
+                        console.log("Load more!");
+
+                        loadPosts();
+                    }
+                });
+
+                $(document).on('click', '.post-username', function(){
+                    window.location.href = "profile.html";
+                });
+
+                $(document).on('click', '#username', function(){
+                    window.location.href = "profile.html";
+                });
+            })
+
+//            $(window).on("load",function() {
+//                $(".album-previews").scroll(function() {
+//                    var windowBottom = $(this).scrollLeft() + $(this).innerWidth();
+//                    $(".album").each(function() {
+//                        /* Check the location of each desired element */
+//                        var objectBottom = $(this).offset().left + $(this).outerWidth();
+//
+//                        console.log(objectBottom + " || " + windowBottom + " || " + $(this).title);
+//                        /* If the element is completely within bounds of the window, fade it in */
+//                        if (objectBottom < windowBottom && $(this).css("opacity") == 0) {  //object comes into view (scrolling down)
+//                            $(this).fadeTo(500,1);
+//                        } else if ($(this).css("opacity") == 1) { //object goes out of view (scrolling up)
+//                            $(this).fadeTo(500,0);
+//                        }
+//                    });
+//                }).scroll(); //invoke scroll-handler on page-load
+//            });
+            
+            $(document).on('click', '.album', function(){
+                localStorage.setItem("albumId", $(this).attr("id"));
+                localStorage.setItem("albumTitle", $(this).attr('title'));
+                localStorage.setItem("nPhotos", $(this).attr('nPhotos'));
+                window.location.href = "album.html";
+            });
+        </script>
+        
+    </head>
+    
+    <body>
+        
+        <nav>
+        
+            <div class = "page-mark" id = "posts">
+                
+                <a href = "index.html">Posts</a>
+                
+                <i class="fa fa-edit"></i>
+                
+            </div>
+        
+            <div class = "page-mark" id = "photos">
+                
+                <a href = "photos.html">Photos</a>
+                
+                <i class="fa fa-picture-o" aria-hidden="true"></i>
+                
+            </div>
+            
+        </nav>
+        
+        <div class = "page">
+            
+            <section class = "sidebar">
+                
+                <div class = "searchbar">
+                    
+                    <input type = "search" id = "searchbox" placeholder="Search">
+                
+                </div>
+                
+                <div class = "user-info">
+                    
+                    <div class = "user-icon"></div>
+
+                    <a id = "username"></a>
+                    
+                    <div class = "details-box">
+                        
+                        <div class = "col" class = "col1">
+
+                            <p id = "name"> </p>
+                            <p id = "phone"> </p>
+                            <p id = "email"> </p>
+                            <p id = "address"> </p>
+
+                        </div>
+                        
+                        <div class = "col" class = "col2" style=":blue;">
+                        
+                            <p id = "website"> </p>
+                            <p id = "company-name"> </p>
+                            <p id = "company-cp"></p>
+                            <p id = "bs"> </p>
+                            
+                        </div>
+                    
+                    </div>
+                    
+                </div>
+
+                <span class = "album-previews"> </span>
+            </section>
+            
+            <section class = "feed" id = "feed">
+            
+<!--
+                <div class = "post">
+
+                    <img src="media/icon.png" class="user-icon">
+
+                    <div class = "post-topbar">
+
+                        <a class="post-username" href="#">
+                            Username
+                        </a>
+
+                    </div>
+
+                    <div class = "post-body">
+
+                        <div class = "post-titlebar">
+                            Title
+                        </div>
+
+                        <div class = "post-content">
+                            should be indented from the titlebar 
+                            content
+                        </div>
+
+                    </div>
+
+                </div>
+-->
+                
+            </section>
+            
+        </div>        
+                <link rel="stylesheet"
+              type="text/css"
+              media="only screen and (max-device-width: 1200px)"
+              href="small-device.css" />
+        
+    </body>
+    
+</html>

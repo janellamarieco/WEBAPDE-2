@@ -26,6 +26,12 @@ html{
     padding: 0;
 }
 
+.modal{
+    position: absolute;
+    z-index: 999;
+    zoom: .7;
+}
+
 .photo-display{
     margin-left: 10%;
 }

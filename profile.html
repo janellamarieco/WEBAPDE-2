@@ -416,6 +416,27 @@
             }
 
             $(document).ready(function(){
+		    
+                // Initialize collapse button
+                $(".button-collapse").sideNav();
+
+                $('.button-collapse').sideNav({
+                    menuWidth: 300, // Default is 300
+                    closeOnClick: true, // Closes side-nav on <a> clicks, useful for Angular/Meteor
+                    draggable: true, // Choose whether you can drag to open on touch screens,
+                    }
+                );
+                var width =  screen.width;
+
+                if(width > 1200){
+                    var a = document.getElementsByClassName("material-icons");
+
+                    for (var i = 0; i < a.length; ++i) {
+                        var item = a[i];
+                        item.style.display = "none";
+                    }
+                }
+		    
                 $.ajax({
                     url: root + '/users/' + userId,
                     method: 'GET',
@@ -424,6 +445,7 @@
                         console.log("Updated user's info");
                     }
                 });
+                document.getElementById("uName").innerHTML = localStorage.getItem("username");
                 document.getElementById("username").innerHTML = localStorage.getItem("username");
 
                 loadPosts();

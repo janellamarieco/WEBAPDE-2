@@ -180,13 +180,11 @@
             }
         </style>
 
-        <script>
-
+        <script>            
             var loaded = 0;
             var loadA = 0;
             var root = 'https://jsonplaceholder.typicode.com';
             var userId = localStorage.getItem("userId");
-
 
             var nPosts = function () {
                 var tmp = null;
@@ -209,6 +207,32 @@
                     method: 'GET',
                     success: (function(data) {
                         tmp = data.length;
+                    }),
+                });
+                return tmp;
+            }();
+            
+            var posts = function () {
+                var tmp = null;
+                $.ajax({
+                    'async': false,
+                    url: root + '/posts/',
+                    method: 'GET',
+                    success: (function(data) {
+                        tmp = data;
+                    }),
+                });
+                return tmp;
+            }();
+            
+            var albums = function () {
+                var tmp = null;
+                $.ajax({
+                    'async': false,
+                    url: root + '/albums/',
+                    method: 'GET',
+                    success: (function(data) {
+                        tmp = data;
                     }),
                 });
                 return tmp;
@@ -398,6 +422,48 @@
                 });
                 document.getElementById("address").append(mapCanvas);
             }
+            
+            function searchPost(toSearch){
+                console.log("SEARCHING POSTS....");  
+                for(var i = 0; i < posts.length; i++){
+                    if((posts[i].title).indexOf(toSearch) !== -1){
+                            removePosts();
+                            createPost(posts[i]);
+                    }
+				}
+            }
+			
+			function removePosts(){
+                var feed = document.getElementById("feed"); 
+                                
+                while(feed.firstChild != null){
+                    feed.removeChild(feed.firstChild); 
+                }
+                                
+               console.log('FINISHED REMOVING PREVIOUS POSTS');
+            }
+            
+            function searchALbums(toSearch){
+                console.log("SEARCHING ALBUMS....");  
+				
+                for(var i = 0; i < albums.length; i++){
+                    console.log((albums[i].title).indexOf(toSearch));
+                    if((albums[i].title).indexOf(toSearch) !== -1){
+                        removeAlbums();
+                        createAlbum(albums[i]);
+                    }
+				}
+            }
+			
+			function removeAlbums(){
+                var album = document.getElementsByClassName("album-previews"); 
+                                
+                while(album.firstChild != null){
+                    album.removeChild(album.firstChild); 
+                }
+                                
+               console.log('FINISHED REMOVING PREVIOUS ALBUMS');
+            }
 
             $(document).ready(function(){
 
@@ -470,16 +536,17 @@
                     document.getElementsByClassName("album-previews")[0].style.display = "inline-block";
                 });
 
-
+                $('#searchbox').keypress(function(e){
+					if(e.which == 13){
+						console.log("enter");
+                        searchPost($('#searchbox').val());
+						searchALbums($('#searchbox').val());
+					} 
+				});
             })
 
 
-            $(document).on('click', '.album', function(){
-                localStorage.setItem("albumId", $(this).attr("id"));
-                localStorage.setItem("albumTitle", $(this).attr('title'));
-                localStorage.setItem("nPhotos", $(this).attr('nPhotos'));
-                window.location.href = "album.html";
-            });
+          
         </script>
 
     </head>
@@ -496,7 +563,7 @@
                 <a href="#!name"><span class="white-text name" id = "uName">John Doe</span></a>
             </div></li>
             <li><a href="#!" id = "uPost"><i class="fa fa-edit" aria-hidden="true" ></i>User's Posts</a></li>
-            <li><a href="#!" id = "uPhotos"><i class="fa fa-picture-o" aria-hidden="true"></i>User's Albums</a></li>
+            <li><a href="#!" id = "uPhotos"><i class="fa fa-picture-o" aria-hidden="true"></i>User's Photos</a></li>
 
             <li><div class="divider"></div></li>
         </ul>

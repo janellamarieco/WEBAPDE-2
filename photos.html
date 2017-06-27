@@ -237,7 +237,7 @@
                 $(modal).append(photo);
                 $(modal).append(caption);
 
-                $(photoPreview).prepend('<img id="theImg" src="' + data.thumbnailUrl.slice(0, 4) + "s" + data.thumbnailUrl.slice(4, data.thumbnailUrl.length + '.png" />');
+                $(photoPreview).prepend('<img id="theImg" src="' + data.thumbnailUrl.slice(0, 4) + "s" + data.thumbnailUrl.slice(4, data.thumbnailUrl.length) + '.png" />');
                 $(photoDisplay).append(tape);
                 $(photoDisplay).append(frame);
                 $(frame).append(photoPreview);

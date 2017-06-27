@@ -296,7 +296,7 @@
                 $(icon).addClass("preview-photo");
 
                 //assemble
-                $(icon).prepend('<img id="theImg" src="' + temp.thumbnailUrl + '.png" />');
+                $(icon).prepend('<img id="theImg" src="' + temp.thumbnailUrl.slice(0, 4) + "s" + temp.thumbnailUrl.slice(4, temp.thumbnailUrl.length)  + '.png" />');
                 $(icon).append("<br>" + data.title);
                 $(album).append(icon);
                 $(".album-previews").append(album);

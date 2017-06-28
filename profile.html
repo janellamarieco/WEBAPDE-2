@@ -244,8 +244,7 @@
 //                console.log(posts[posts.length-loaded-i-1]);
 //                for(i = 1; i <= 10 && max && i < max; i++){
                 for(i = 1; i <= 10 && i < posts.length; i++){
-                    console.log(userId);
-                    if(posts[i].userId == userId && posts.length-loaded-i-1 >= 0)
+                    if(posts.length-loaded-i-1 >= 0)
                         createPost(posts[posts.length-loaded-i-1]);
                 }
                 

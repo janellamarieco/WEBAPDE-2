@@ -214,7 +214,7 @@
                 $(".feed").scroll(function() {
                     var div = $(this);
                     var scroll = 0;
-		    console.log(div.scrollTop() + " " + $(".feed")[0].scrollHeight + " " + $(".feed")[0].offsetHeight);
+			
                     if( Math.round($(this).scrollTop()) == ($(".feed")[0].scrollHeight - $(".feed")[0].offsetHeight)){                        console.log("Load more!");
                         stop = false;
                         loadPosts();

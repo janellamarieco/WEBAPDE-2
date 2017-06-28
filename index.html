@@ -116,7 +116,8 @@
                 
 //                for(i = 1; i <= 10 && max && i < max; i++){
                 for(i = 0; i < 10 && i < posts.length; i++){
-                    createPost(posts[posts.length-loaded-i-1]);
+			if(posts.length-loaded-i-1 > 0)
+	                    createPost(posts[posts.length-loaded-i-1]);
                 }
                 
                 loaded += 10;

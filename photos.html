@@ -290,7 +290,7 @@
                         scroll = div.scrollTop();
                     }, 200);
                     console.log(scroll);*/
-                    if (Math.round($(this).scrollTop()) == $(".feed")[0].scrollHeight - 600) { //scrollTop is 0 based
+                    if( Math.round($(this).scrollTop()) == ($(".feed")[0].scrollHeight - $(".feed")[0].offsetHeight)){
                         console.log("Load more!");
 
                         loadPhotos();

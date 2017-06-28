@@ -535,7 +535,14 @@
                     document.getElementById("feed").style.display = "none";
                     document.getElementsByClassName("album-previews")[0].style.display = "inline-block";
                 });
-
+		    
+                $(document).on('click', '.album', function(){
+                    localStorage.setItem("albumId", $(this).attr("id"));
+                    localStorage.setItem("albumTitle", $(this).attr('title'));
+                    localStorage.setItem("nPhotos", $(this).attr('nPhotos'));
+                    window.location.href = "album.html";
+                });
+		    
                 $('#searchbox').keypress(function(e){
 					if(e.which == 13){
 						console.log("enter");

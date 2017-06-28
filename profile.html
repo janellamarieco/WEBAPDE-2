@@ -273,14 +273,14 @@
                 });
             }
 
-            function postAlbum(data, temp){
+            function postAlbum(data, temp, nPhotos){
                 //create elements
                 var album = document.createElement("div");
                 var icon = document.createElement("div");
                 album.setAttribute('href', '#');
                 album.setAttribute('id', data.id);
                 album.setAttribute('title', data.title);
-                album.setAttribute('nPhotos', photos.length);
+                album.setAttribute('nPhotos', nPhotos);
 
                 console.log(data.id + " " + temp.thumbnailUrl + " " + data.title);
                 //add classes

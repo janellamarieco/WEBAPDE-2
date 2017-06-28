@@ -208,10 +208,10 @@
             
             function getAllPosts(){
 //                var tmp = null;
-				
+
                 $.ajax({
                     //'async': false,
-                    url: root + '/posts/',
+                    url: root + '/users/'+ userId + '/posts/' ,
                     method: 'GET',
                     success: (function(data) {
 //                        tmp = data;
@@ -244,7 +244,8 @@
 //                console.log(posts[posts.length-loaded-i-1]);
 //                for(i = 1; i <= 10 && max && i < max; i++){
                 for(i = 1; i <= 10 && i < posts.length; i++){
-                    if(posts.length-loaded-i-1 >= 0)
+                    console.log(userId);
+                    if(posts[i].userId == userId && posts.length-loaded-i-1 >= 0)
                         createPost(posts[posts.length-loaded-i-1]);
                 }
                 
@@ -271,16 +272,18 @@
                 }).then(function(temp){
                     postItem(data, temp);
                 });
+                
+                userId = data.userId;
             }
 
-            function postAlbum(data, temp, nPhotos){
+            function postAlbum(data, temp){
                 //create elements
                 var album = document.createElement("div");
                 var icon = document.createElement("div");
                 album.setAttribute('href', '#');
                 album.setAttribute('id', data.id);
                 album.setAttribute('title', data.title);
-                album.setAttribute('nPhotos', nPhotos);
+                album.setAttribute('nPhotos', photos.length);
 
                 console.log(data.id + " " + temp.thumbnailUrl + " " + data.title);
                 //add classes
@@ -425,9 +428,11 @@
 			
 			function removeAlbums(){
                 var album = document.getElementsByClassName("album-previews"); 
+                
+                console.log("RMEOVE" + album.item(0));
                                 
-                while(album.firstChild != null){
-                    album.removeChild(album.firstChild); 
+                while(album.item(0) != null){
+                    album.removeChild(album.item(0)); 
                 }
                                 
                console.log('FINISHED REMOVING PREVIOUS ALBUMS');
@@ -486,7 +491,7 @@
                     }, 200);
                     console.log(scroll);*/
 
-                    if( Math.round($(this).scrollTop()) == ($(".feed")[0].scrollHeight - $(".feed")[0].offsetHeight)){ //scrollTop is 0 based
+                    if (Math.round($(this).scrollTop()) == $(".feed")[0].scrollHeight - 600) { //scrollTop is 0 based
                         console.log("Load more!");
 
                         loadPosts();
@@ -510,13 +515,6 @@
                     document.getElementById("feed").style.display = "none";
                     document.getElementsByClassName("album-previews")[0].style.display = "inline-block";
                 });
-		    
-                $(document).on('click', '.album', function(){
-                    localStorage.setItem("albumId", $(this).attr("id"));
-                    localStorage.setItem("albumTitle", $(this).attr('title'));
-                    localStorage.setItem("nPhotos", $(this).attr('nPhotos'));
-                    window.location.href = "album.html";
-                });
 
                 $('#searchbox').keypress(function(e){
 					if(e.which == 13){
@@ -533,8 +531,6 @@
 
     <body>
 
-
-
         <ul id="slide-out" class="side-nav">
             <li><div class="user-view">
                 <div class="background" style="background: rgba(189, 106, 27, 0.84);">
@@ -543,7 +539,7 @@
                 <a href="#!name"><span class="white-text name" id = "uName">John Doe</span></a>
             </div></li>
             <li><a href="#!" id = "uPost"><i class="fa fa-edit" aria-hidden="true" ></i>User's Posts</a></li>
-            <li><a href="#!" id = "uPhotos"><i class="fa fa-picture-o" aria-hidden="true"></i>User's Albums</a></li>
+            <li><a href="#!" id = "uPhotos"><i class="fa fa-picture-o" aria-hidden="true"></i>User's Photos</a></li>
 
             <li><div class="divider"></div></li>
         </ul>
@@ -610,7 +606,7 @@
 
                 </div>
 
-                <span class = "album-previews"> </span>
+                <span class = "album-previews" name ="album"> </span>
             </section>
 
             <section class = "feed" id = "feed">
